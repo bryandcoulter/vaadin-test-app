@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-context-menu/vaadin-context-menu.html">
+
+<dom-module id="vaadin-context-menu-component">
+  <template>
+    <vaadin-context-menu>
+      <template>
+        <style>
+          .box {
+            /* height: 100px; */
+            color: pink;
+            padding: 8px 4px;
+            background: red;
+          }
+        </style>
+        <div class="box">
+          LOOK WHAT YOU'VE DONE
+        </div>
+      </template>
+      <p>Hi mom.... (right-click-me)</p>
+    </vaadin-context-menu>
+  </template>
+
+  <script>
+    class VaadinContextMenuComponent extends Polymer.Element {
+
+      static get is() { return 'vaadin-context-menu-component'; }
+
+      static get properties() {
+        return {
+          
+        };
+      }
+    }
+
+    window.customElements.define(VaadinContextMenuComponent.is, VaadinContextMenuComponent);
+  </script>
+</dom-module>

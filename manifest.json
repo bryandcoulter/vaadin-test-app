@@ -1,0 +1,6 @@
+{
+  "name": "vaadin-test",
+  "short_name": "vaadin-test",
+  "start_url": "/",
+  "display": "standalone"
+}
