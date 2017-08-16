@@ -1,7 +1,7 @@
 sudo: false
 dist: trusty
 language: node_js
-node_js: stable
+node_js: 8.0
 
 cache:
   directories:
@@ -13,12 +13,17 @@ addons:
 
 install:
   - npm install
-  - npm install -g bower
-  - bower install
+  - polymer install
 
 before_script:
   - gulp lint
-  - ([ "$TRAVIS_EVENT_TYPE" = "pull_request" ] || TRAVIS_BRANCH=quick/${TRAVIS_BUILD_ID} xvfb-run -s '-screen 0 1024x768x24' wct)
+  - polymer lint --rules polymer-2 --input *.html
+  - xvfb-run -s '-screen 0 1024x768x24' polymer test
 
 script:
-  - xvfb-run -s '-screen 0 1024x768x24' wct
+  - if [[ "$TRAVIS_EVENT_TYPE" != "pull_request" && "$TRAVIS_BRANCH" != quick/* ]]; then
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs;
+    fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron;
+    fi

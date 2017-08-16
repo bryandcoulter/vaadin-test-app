@@ -1,6 +1,6 @@
 {
   "name": "vaadin-split-layout",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Polymer element for partitioning a layout into resizeable areas",
   "main": "vaadin-split-layout.html",
   "repository": "vaadin/vaadin-split-layout",
@@ -27,7 +27,7 @@
     "gulp-eslint": "^3.0.1",
     "gulp-html-extract": "^0.1.0",
     "gulp-stylelint": "^3.7.0",
-    "polymer-cli": "0.18.0-pre.13",
+    "polymer-cli": "^0.18.0",
     "polyserve": "^0.15.0",
     "stylelint-config-vaadin": "^0.1.0",
     "web-component-tester": "^5.0.0"

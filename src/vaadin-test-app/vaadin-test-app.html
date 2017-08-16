@@ -2,6 +2,9 @@
 <link rel="import" href="vaadin-grid-component.html">
 <link rel="import" href="vaadin-combo-box-component.html">
 <link rel="import" href="vaadin-context-menu-component.html">
+<link rel="import" href="vaadin-date-picker-component.html">
+<link rel="import" href="vaadin-split-layout-component.html">
+<link rel="import" href="vaadin-upload-component.html">
 
 <dom-module id="vaadin-test-app">
   <template>
@@ -9,11 +12,109 @@
       :host {
         display: block;
       }
-    </style>
-    <h2>MEOW!</h2>
-    <vaadin-grid-component></vaadin-grid-component>
-    <vaadin-combo-box-component></vaadin-combo-box-component>
-    <vaadin-context-menu-component></vaadin-context-menu-component>
+      #grid {
+        display: grid;
+        grid-template-colums: 1fr 1fr 1fr;
+        grid-template-rows: auto;
+        grid-column-gap: 8px;
+        grid-row-gap: 8px;
+        grid-template-areas:
+          "title   title    v-menu"
+          "v-grid   v-grid   v-upload"
+          "v-grid  v-grid  v-combo"
+          "v-split   v-split  v-date";
+      }
+      #title {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: title;
+      }
+      h1 {
+        font-size: 56px;
+        color: #333;
+        font-family: 'Abril Fatface';
+        font-weight: 400;
+      }
+      h2 {
+        font-size: 24px;
+        color: #333;
+        font-family: 'Abril Fatface';
+        font-weight: 400;
+      }
+      #v-menu {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-menu;
+      }
+      #v-grid {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-grid;
+      }
+      #v-upload {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-upload;
+      }
+      #v-combo {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-combo;
+      }
+      #v-split {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-split;
+      }
+      #v-date {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 4px;
+        grid-area: v-date;
+      }
+      </style>
+    <div id="grid">
+      <div id="title">
+        <h1>Vaadin Components test page!</h1>
+      </div>
+      <div id="v-menu">
+        <h2>vaadin-context-menu</h2>
+        <vaadin-context-menu-component></vaadin-context-menu-component>
+      </div>
+      <div id="v-grid">
+        <h2>vaadin-grid</h2>
+        <vaadin-grid-component></vaadin-grid-component>
+      </div>
+      <div id="v-upload">
+        <h2>vaadin-upload</h2>
+        <vaadin-upload-component></vaadin-upload-component>
+      </div>
+      <div id="v-combo">
+        <h2>vaadin-combo-box</h2>
+        <vaadin-combo-box-component></vaadin-combo-box-component>
+      </div>
+      <div id="v-split">
+        <h2>vaadin-split-layout</h2>
+        <vaadin-split-layout-component></vaadin-split-layout-component>
+      </div>
+      <div id="v-date">
+        <h2>vaadin-date-picker</h2>
+        <vaadin-date-picker-component></vaadin-date-picker-component>
+      </div>
+    </div>
 
   </template>
 

@@ -1,0 +1,32 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+
+<!--
+`<vaadin-date-picker-component>` is Description
+
+@element vaadin-date-picker-component
+-->
+<dom-module id="vaadin-date-picker-component">
+  <template>
+    <style>
+
+    </style>
+    <vaadin-date-picker></vaadin-date-picker>
+
+  </template>
+
+  <script>
+    class VaadinDatePickerComponent extends Polymer.Element {
+
+      static get is() { return 'vaadin-date-picker-component'; }
+
+      static get properties() {
+        return {
+          
+        };
+      }
+    }
+
+    window.customElements.define(VaadinDatePickerComponent.is, VaadinDatePickerComponent);
+  </script>
+</dom-module>

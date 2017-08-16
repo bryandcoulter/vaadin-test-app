@@ -62,7 +62,9 @@
 
 1. Install [polymer-cli](https://www.npmjs.com/package/polymer-cli): `npm install -g polymer-cli`
 
-1. When in the `vaadin-split-layout` directory, run `polymer serve`, after that you will be able to access:
+1. When in the `vaadin-split-layout` directory, run `polymer install --variants` to install Bower dependencies
+
+1. Run `polymer serve`, after that you will be able to access:
 
   - Polymer1-compatible version:
 
@@ -75,6 +77,8 @@
     - API documentation: http://127.0.0.1:8001/components/vaadin-split-layout/
     - Examples: http://127.0.0.1:8001/components/vaadin-split-layout/demo/
     - Tests: http://127.0.0.1:8001/components/vaadin-split-layout/test/
+    
+Note that ports `8000` and `8001` could be different in your environment.
 
 
 ## Running tests from the command line
@@ -90,7 +94,7 @@ We are using [ESLint](http://eslint.org/) for linting JavaScript code. You can c
 ## Creating a pull request
 
   - Make sure your code is compliant with our code linters: `gulp lint`
-  - Check that tests are passing: `npm test`
+  - Check that tests are passing: `polymer test`
   - [Submit a pull request](https://www.digitalocean.com/community/tutorials/how-to-create-a-pull-request-on-github) with detailed title and description
   - Wait for response from one of Vaadin Elements team members
 

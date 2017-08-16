@@ -27,6 +27,7 @@ Custom property | Description | Default
 `--vaadin-upload-buttons`|A mixin that is applied to the buttons container|`{}`
 `--vaadin-upload-buttons-primary`|A mixin that is applied to the primary buttons container (left side)|`{}`
 `--vaadin-upload-buttons-secondary`|A mixin that is applied to the secondary buttons container (right side)|`{}`
+`--vaadin-upload-button-add-wrapper`|A mixin that is applied to the div wrapping the upload button|`{}`
 `--vaadin-upload-button-add`|A mixin that is applied to the upload button|`{}`
 `--vaadin-upload-button-add-disabled`|A mixin that is applied to the upload button when `maxFiles` limit is reached|`{}`
 
@@ -49,7 +50,7 @@ Custom property | Description | Default
   <template>
     <style>
       :host {
-        @apply(--layout-vertical);
+        @apply --layout-vertical;
         display: block;
         position: relative;
         text-align: left;
@@ -72,7 +73,7 @@ Custom property | Description | Default
         over it. Helps to reduce the amount of events fired.
       */
       :host::before {
-        @apply(--layout-fit);
+        @apply --layout-fit;
         content: '';
         display: none;
         z-index: 10;
@@ -84,83 +85,95 @@ Custom property | Description | Default
 
       #dragRipple {
         color: var(--light-primary-color, #7CD8F7);
-        @apply(--vaadin-upload-drag-ripple);
+        @apply --vaadin-upload-drag-ripple;
       }
 
       #dropLabel {
-        @apply(--layout-flex);
-        @apply(--paper-font-body2);
+        @apply --layout-flex;
+        @apply --paper-font-body2;
         position: relative;
         padding: .43em .57em;
         margin: 0 .29em;
         color: var(--disabled-text-color, #b3b3b3);
-        @apply(--vaadin-upload-drop-label);
+        @apply --vaadin-upload-drop-label;
       }
 
-      :host([dragover-valid]) #dropLabel,
-      :host([dragover-valid]) ::content .drop-label {
+      :host([dragover-valid]) #dropLabel {
         color: var(--primary-color, #00B4F0);
-        @apply(--vaadin-upload-drop-label-dragover);
+        @apply --vaadin-upload-drop-label-dragover;
       }
 
-      #dropLabel ::content iron-icon {
+      #dropLabel ::slotted(iron-icon),
+      #dropLabelIcon {
         margin-right: .25em;
-        @apply(--vaadin-upload-drop-label-icon);
+        @apply --vaadin-upload-drop-label-icon;
       }
 
       #fileList {
         position: relative;
-        @apply(--vaadin-upload-file-list);
+        @apply --vaadin-upload-file-list;
       }
 
       #buttons {
-        @apply(--layout-horizontal);
+        @apply --layout-horizontal;
         position: relative;
-        @apply(--vaadin-upload-buttons);
+        @apply --vaadin-upload-buttons;
       }
 
       #buttonsPrimary {
-        @apply(--layout-horizontal);
-        @apply(--layout-flex);
-        @apply(--layout-start);
+        @apply --layout-horizontal;
+        @apply --layout-flex;
+        @apply --layout-start;
         margin-left: -.29em;
-        @apply(--vaadin-upload-buttons-primary);
+        @apply --vaadin-upload-buttons-primary;
       }
 
       #addFiles {
-        @apply(--paper-font-button);
+        @apply --vaadin-upload-button-add-wrapper;
+      }
+
+      #addButton {
+        @apply --paper-font-button;
         padding: .43em .57em;
         background: var(--primary-color, #00B4F0);
         color: var(--primary-font-color, #FFF);
-        @apply(--vaadin-upload-button-add);
+        @apply --vaadin-upload-button-add;
       }
 
-      #addFiles[disabled] {
+      #addButton[disabled] {
         background: var(--divider-color, #e0e0e0);
         color: var(--disabled-text-color, gray);
-        @apply(--vaadin-upload-button-add-disabled);
+        @apply --vaadin-upload-button-add-disabled;
       }
     </style>
 
     <div id="buttons">
       <div id="buttonsPrimary">
-        <paper-button id="addFiles" on-tap="_onAddFilesClick" disabled="[[_maxFilesAdded(maxFiles, files.length)]]">[[_i18nPlural(maxFiles, i18n.addFiles, i18n.addFiles.*)]]</paper-button>
+        <div id="addFiles" on-tap="_onAddFilesClick">
+          <slot name="add-button">
+            <paper-button id="addButton" disabled$="[[maxFilesReached]]">
+              [[_i18nPlural(maxFiles, i18n.addFiles, i18n.addFiles.*)]]
+            </paper-button>
+          </slot>
+        </div>
         <div id="dropLabel" hidden$="[[nodrop]]">
-          <content select=".drop-label">
-            <iron-icon icon="vaadin-upload:file-upload"></iron-icon>
+          <slot name="drop-label-icon">
+            <iron-icon id="dropLabelIcon" icon="vaadin-upload:file-upload"></iron-icon>
+          </slot>
+          <slot name="drop-label">
             [[_i18nPlural(maxFiles, i18n.dropFiles, i18n.dropFiles.*)]]
-          </content>
+          </slot>
         </div>
       </div>
     </div>
-    <content select=".file-list">
+    <slot name="file-list">
       <div id="fileList">
         <template is="dom-repeat" items="[[files]]" as="file">
           <vaadin-upload-file file="[[file]]"></vaadin-upload-file>
         </template>
       </div>
-    </content>
-    <content></content>
+    </slot>
+    <slot></slot>
     <input type="file" id="fileInput" on-change="_onFileInputChange" hidden accept$="{{accept}}" multiple$="[[_isMultiple(maxFiles)]]">
     <paper-ripple id="dragRipple" noink></paper-ripple>
   </template>
@@ -191,7 +204,7 @@ Custom property | Description | Default
           } catch (e) {
             return false;
           }
-        },
+        }
       },
 
       /**
@@ -279,6 +292,17 @@ Custom property | Description | Default
       },
 
       /**
+       * Specifies if the maximum number of files have been uploaded
+       */
+      maxFilesReached: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true,
+        computed: '_maxFilesAdded(maxFiles, files.length)'
+      },
+
+      /**
        * Specifies the types of files that the server accepts.
        * Syntax: a comma-separated list of MIME type patterns (wildcards are
        * allowed) or file extensions.
@@ -321,6 +345,15 @@ Custom property | Description | Default
       },
 
       /**
+       * Prevents upload(s) from immediately uploading upon adding file(s).
+       * When set, you must manually trigger uploads using the `uploadFiles` method
+       */
+      noAuto: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
        * The object used to localize this component.
        * For changing the default localization, change the entire
        * _i18n_ object or just the property you want to modify.
@@ -346,7 +379,8 @@ Custom property | Description | Default
        status: {
          connecting: 'Connecting...',
          stalled: 'Stalled.',
-         processing: 'Processing File...'
+         processing: 'Processing File...',
+         held: 'Queued'
        },
        remainingTime: {
          prefix: 'remaining time: ',
@@ -394,7 +428,8 @@ Custom property | Description | Default
               status: {
                 connecting: 'Connecting...',
                 stalled: 'Stalled.',
-                processing: 'Processing File...'
+                processing: 'Processing File...',
+                held: 'Queued'
               },
               remainingTime: {
                 prefix: 'remaining time: ',
@@ -420,7 +455,7 @@ Custom property | Description | Default
       'drop': '_onDrop',
       'file-retry': '_onFileRetry',
       'file-abort': '_onFileAbort',
-      'file-remove': '_onFileRemove',
+      'file-remove': '_onFileRemove'
     },
 
     _formatSize: function(bytes) {
@@ -475,8 +510,8 @@ Custom property | Description | Default
           ')';
     },
 
-    _maxFilesAdded: function() {
-      return this.maxFiles >= 0 && this.files.length >= this.maxFiles;
+    _maxFilesAdded: function(maxFiles, numFiles) {
+      return maxFiles >= 0 && numFiles >= maxFiles;
     },
 
     _dragRippleAction: function(action, event) {
@@ -528,7 +563,7 @@ Custom property | Description | Default
     _onDragover: function(event) {
       event.preventDefault();
       if (!this.nodrop && !this._dragover) {
-        this._dragoverValid = !this._maxFilesAdded();
+        this._dragoverValid = !this.maxFilesReached;
         if (this._dragoverValid) {
           this._dragRippleAction('down', event);
         }
@@ -591,6 +626,19 @@ Custom property | Description | Default
       file.status = this._formatFileProgress(file);
     },
 
+    /**
+     * Triggers the upload of any files that are not completed
+     *
+     * @param {Array} [files] - Files being uploaded. Defaults to all outstanding files
+     */
+    uploadFiles: function(files) {
+      files = files || this.files;
+      files = files.filter(function(file) {
+        return !file.complete;
+      });
+      Array.prototype.forEach.call(files, this._uploadFile.bind(this));
+    },
+
     _uploadFile: function(file) {
       if (file.uploading) {
         return;
@@ -610,12 +658,13 @@ Custom property | Description | Default
 
         file.loaded = loaded;
         file.progress = progress;
-        file.indeterminate = loaded <= 0 || loaded >= total, true;
+        file.indeterminate = loaded <= 0 || loaded >= total;
+
         if (file.error) {
           file.indeterminate = file.status = undefined;
         } else if (!file.abort) {
           if (progress < 100) {
-            this._setStatus(file, total, loaded, elapsed, progress);
+            this._setStatus(file, total, loaded, elapsed);
             stalledId = setTimeout(function() {
               file.status = this.i18n.uploading.status.stalled;
               this._notifyFileChanges(file);
@@ -729,7 +778,7 @@ Custom property | Description | Default
      * @param {File} file File being added
      */
     _addFile: function(file) {
-      if (this._maxFilesAdded()) {
+      if (this.maxFilesReached) {
         this.fire('file-reject', {file: file, error: this.i18n.error.tooManyFiles});
         return;
       }
@@ -744,8 +793,12 @@ Custom property | Description | Default
         return;
       }
       file.loaded = 0;
+      file.status = this.i18n.uploading.status.held;
       this.unshift('files', file);
-      this._uploadFile(file);
+
+      if (!this.noAuto) {
+        this._uploadFile(file);
+      }
     },
 
     /**
@@ -757,6 +810,10 @@ Custom property | Description | Default
     },
 
     _onAddFilesClick: function() {
+      if (this.maxFilesReached) {
+        return;
+      }
+
       if (Polymer.Gestures.resetMouseCanceller) {
         /*
           With Polymer v1.7.1, the ghost-click prevention cancels the synthetic
@@ -811,8 +868,8 @@ Custom property | Description | Default
    *
    * @event file-reject
    * @param {Object} detail
-   *  @param {Object} detail.file the file added
-   *  @param {Object} detail.error the cause
+   * @param {Object} detail.file the file added
+   * @param {Object} detail.error the cause
    */
 
   /**
@@ -821,9 +878,9 @@ Custom property | Description | Default
    *
    * @event upload-before
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
-   *   @param {Object} detail.file.uploadTarget the upload request URL, initialized with the value of vaadin-upload `target` property
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.file.uploadTarget the upload request URL, initialized with the value of vaadin-upload `target` property
    */
 
   /**
@@ -834,9 +891,9 @@ Custom property | Description | Default
    *
    * @event upload-request
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
-   *  @param {Object} detail.formData the FormData object
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.formData the FormData object
    */
 
   /**
@@ -844,8 +901,8 @@ Custom property | Description | Default
    *
    * @event upload-start
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
    */
 
   /**
@@ -853,13 +910,13 @@ Custom property | Description | Default
    *
    * @event upload-progress
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded with loaded info
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded with loaded info
    */
 
   /**
    * Fired when we have the actual server response, and before the component
-   * analises it. It's useful for developers to make the upload fail depending
+   * analyses it. It's useful for developers to make the upload fail depending
    * on the server response. If the event is preventDefault the vaadin-upload
    * will return allowing the user to do something on his own like retry the
    * upload, etc. since he has full access to the `xhr` and `file` objects.
@@ -869,8 +926,8 @@ Custom property | Description | Default
    *
    * @event upload-response
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
    */
 
   /**
@@ -878,8 +935,8 @@ Custom property | Description | Default
    *
    * @event upload-success
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded with loaded info
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded with loaded info
    */
 
   /**
@@ -887,8 +944,8 @@ Custom property | Description | Default
    *
    * @event upload-error
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
    */
 
   /**
@@ -897,8 +954,8 @@ Custom property | Description | Default
    *
    * @event upload-retry
    * @param {Object} detail
-   *  @param {Object} detail.xhr the previous upload xhr
-   *  @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.xhr the previous upload xhr
+   * @param {Object} detail.file the file being uploaded
    */
 
   /**
@@ -907,8 +964,8 @@ Custom property | Description | Default
    *
    * @event upload-abort
    * @param {Object} detail
-   *  @param {Object} detail.xhr the xhr
-   *  @param {Object} detail.file the file being uploaded
+   * @param {Object} detail.xhr the xhr
+   * @param {Object} detail.file the file being uploaded
    */
 
 </script>

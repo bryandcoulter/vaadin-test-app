@@ -7,12 +7,13 @@
 
   <title>vaadin-date-picker Advanced Usage</title>
 
-  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../sugar/dist/sugar.min.js"></script>
   <script src="../../sugar/dist/locales/fi.js"></script>
   <link rel="import" href="common.html">
   <link rel="import" href="../../iron-icon/iron-icon.html">
   <link rel="import" href="../../iron-icons/iron-icons.html">
+  <link rel="import" href="../../iron-input/iron-input.html">
 
 </head>
 
@@ -76,71 +77,45 @@
           var start = document.querySelector('#start');
           var end = document.querySelector('#end');
           start.addEventListener('value-changed', function() {
-            // Open the end date picker with a delay to
-            // make it less confusing.
-            window.setTimeout(function() {
-              end.value = start.value;
-              end.open();
-            }, 500);
+            if (start.value) {
+              // Open the end date picker with a delay to
+              // make it less confusing.
+              window.setTimeout(function() {
+                end.value = start.value;
+                start.close();
+                end.open();
+              }, 500);
+            }
           });
         </script>
-      </template>
-    </demo-snippet>
-
-    <h3>Styling</h3>
-    <demo-snippet>
-      <template>
-        <style is="custom-style">
-          .custom-theme {
-            --primary-color: var(--paper-indigo-700);
-            --dark-theme-background-color: #fff;
-            --dark-theme-secondary-color: #737373;
-            --primary-text-color: #abc;
-            --secondary-text-color: #bcbcbc;
-            --light-primary-color: var(--paper-indigo-500);
-            --primary-background-color: var(--paper-grey-900);
-
-            --vaadin-date-picker-toolbar: {
-              background: var(--paper-grey-900);
-            }
-            --vaadin-date-picker-calendar-weekday-cell: {
-              text-transform: capitalize;
-              font-size: 14px;
-            }
-            --vaadin-date-picker-calendar-cell-selected: {
-              color: #fff;
-            }
-          }
-        </style>
-        <vaadin-date-picker class="custom-theme" label="Birthday"></vaadin-date-picker>
       </template>
     </demo-snippet>
 
     <h3>Custom Validator</h3>
+    <p>Extend <code>Vaadin.DatePickerElement</code> to create your own custom element,
+       then override the <code>checkValidity(value)</code> method to validate the input.
     <demo-snippet>
-      <template>
-        <vaadin-date-picker
-          id="custom-validation"
-          auto-validate
-          label="Only this year is accepted">
-        </vaadin-date-picker>
+      <demo-snippet>
+        <template>
+          <vaadin-date-picker-current-year></vaadin-date-picker-current-year>
 
-        <script>
-          document.addEventListener('WebComponentsReady', function() {
-            new Polymer.IronMeta({
-              type: 'validator',
-              key: 'this-year-validator',
-              value: {
-                validate: function(value) {
-                  var currentYear = new Date().getFullYear();
-                  return new Date(value).getFullYear() === currentYear;
+          <script>
+            window.addEventListener('WebComponentsReady', function() {
+              class DatePickerCurrentYearElement extends Vaadin.DatePickerElement {
+                checkValidity(value) {
+                  var valid = super.checkValidity();
+                  if (valid) {
+                    var currentYear = new Date().getFullYear();
+                    valid = new Date(value).getFullYear() === currentYear;
+                  }
+                  return valid;
                 }
               }
+              customElements.define('vaadin-date-picker-current-year', DatePickerCurrentYearElement);
             });
-            document.querySelector('#custom-validation').validator = 'this-year-validator';
-          });
-        </script>
-      </template>
+          </script>
+        </template>
+      </demo-snippet>
     </demo-snippet>
 
     <h3>Custom Inputs</h3>
@@ -148,15 +123,17 @@
       <template>
         <style is="custom-style">
           .my-input1 input {
-            background: var(--paper-grey-100);
-            border: 2px solid var(--paper-blue-500);
+            background: #f5f5f5;
+            border: 2px solid #2196f3;
             border-radius: 4px;
             padding: 4px;
             text-align: center;
           }
         </style>
         <vaadin-date-picker-light class="my-input1">
-          <input is="iron-input" placeholder="Date" size="10"/>
+          <iron-input>
+            <input placeholder="Date" size="10"/>
+          </iron-input>
         </vaadin-date-picker-light>
       </template>
     </demo-snippet>
@@ -174,7 +151,10 @@
          <div class="my-input2">
            <iron-icon icon="event"></iron-icon>
            CHECK-IN:
-           <input is="iron-input" size="10"/>
+           <iron-input>
+             <input size="10"/>
+           </iron-input>
+
          </div>
         </vaadin-date-picker-light>
       </template>

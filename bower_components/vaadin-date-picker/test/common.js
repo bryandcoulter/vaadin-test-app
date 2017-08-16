@@ -1,6 +1,8 @@
-var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-var safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1 && navigator.userAgent.toLowerCase().indexOf('chrome/') == -1;
-var android = /(android)/i.test(navigator.userAgent);
+var ua = navigator.userAgent;
+var ios = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+var safari = ua.toLowerCase().indexOf('safari/') > -1 && ua.toLowerCase().indexOf('chrome/') == -1;
+var android = /(android)/i.test(ua);
+var ie11 = /Trident/.test(ua);
 
 function getDefaultI18n() {
   return {
@@ -44,10 +46,7 @@ function close(datepicker, callback) {
 }
 
 function tap(element) {
-  Polymer.Base.fire('tap', {}, {
-    bubbles: true,
-    node: element
-  });
+  element.dispatchEvent(new CustomEvent('tap', {bubbles: true, detail: {}, composed: true}));
 }
 
 function monthsEqual(date1, date2) {
@@ -59,8 +58,8 @@ function getFirstVisibleItem(scroller, bufferOffset) {
   bufferOffset = (bufferOffset || 0);
 
   scroller._buffers.forEach(function(buffer) {
-    [].forEach.call(buffer.children, function(itemWrapper) {
-      children.push(itemWrapper);
+    [].forEach.call(buffer.children, function(insertionPoint) {
+      children.push(insertionPoint._itemWrapper);
     });
   });
   var scrollerRect = scroller.getBoundingClientRect();
@@ -83,13 +82,40 @@ function describeSkipIf(bool, title, callback) {
 }
 
 function waitUntilScrolledTo(overlay, date, callback) {
-  if (overlay.$.scroller.position) {
+  if (overlay.$.monthScroller.position) {
     overlay._onMonthScroll();
   }
   var monthIndex = overlay._differenceInMonths(date, new Date());
-  if (overlay.$.scroller.position === monthIndex) {
+  if (overlay.$.monthScroller.position === monthIndex) {
     Polymer.RenderStatus.afterNextRender(overlay, callback);
   } else {
     setTimeout(waitUntilScrolledTo, 10, overlay, date, callback);
   }
+}
+
+// IE11 throws errors when the fixture is removed from the DOM and the focus remains in the native control.
+// Also, FF and Chrome are unable to focus input/button when tests are run in the headless window manager used in Travis
+function monkeyPatchNativeFocus() {
+  if (window.Vaadin && Vaadin.TextFieldElement) {
+    Vaadin.TextFieldElement.prototype.focus = function() {
+      this._setFocused(true);
+    };
+    Vaadin.TextFieldElement.prototype.blur = function() {
+      this._setFocused(false);
+    };
+  }
+  if (window.Vaadin && Vaadin.ButtonElement) {
+    Vaadin.ButtonElement.prototype.focus = function() {
+      this._setFocused(true);
+    };
+    Vaadin.DatePickerElement.prototype.blur = function() {
+      this._inputElement._setFocused(false);
+    };
+  }
+}
+
+if (window.Polymer) { // Chrome
+  setTimeout(monkeyPatchNativeFocus, 1);
+} else { // Polyfill
+  window.addEventListener('WebComponentsReady', monkeyPatchNativeFocus);
 }

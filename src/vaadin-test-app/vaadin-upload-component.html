@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-upload/vaadin-upload.html">
+
+<!--
+`<vaadin-upload-component>` is Description
+
+@element vaadin-upload-component
+-->
+<dom-module id="vaadin-upload-component">
+  <template>
+    <style>
+
+    </style>
+
+    <vaadin-upload></vaadin-upload>    
+
+  </template>
+
+  <script>
+    class VaadinUploadComponent extends Polymer.Element {
+
+      static get is() { return 'vaadin-upload-component'; }
+
+      static get properties() {
+        return {
+          
+        };
+      }
+    }
+
+    window.customElements.define(VaadinUploadComponent.is, VaadinUploadComponent);
+  </script>
+</dom-module>

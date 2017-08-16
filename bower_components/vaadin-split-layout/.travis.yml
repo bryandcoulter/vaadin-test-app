@@ -13,18 +13,19 @@ addons:
 
 install:
   - npm install
-  - npm install -g bower
   - polymer install --variants
 
 before_script:
   - gulp lint
-  - ([ "$TRAVIS_EVENT_TYPE" = "pull_request" ] || TRAVIS_BRANCH=quick/${TRAVIS_BUILD_ID} xvfb-run -s '-screen 0 1024x768x24' polymer test)
+  - polymer lint --rules polymer-2-hybrid --input *.html
+  - ([ "$TRAVIS_EVENT_TYPE" = "pull_request" ] || TRAVIS_BRANCH=quick/${TRAVIS_BUILD_ID} xvfb-run -s '-screen 0 1024x768x24' polymer test -l chrome -l firefox)
 
 script:
-  - ([ "$TRAVIS_EVENT_TYPE" = "pull_request" ] || gemini test test/visual)
-  - xvfb-run -s '-screen 0 1024x768x24' wct
+  - xvfb-run -s '-screen 0 1024x768x24' polymer test
+  # Visual tests against Polymer 2.0
+  - gemini test test/visual
+
+  # Visual tests against Polymer 1.x
   - rm -rf bower_components
-  - cp bower-polymer2.json bower.json
-  - cp wct.conf-2.0.js wct.conf.js
-  - bower install --quiet --no-color
-  - xvfb-run -s '-screen 0 1024x768x24' wct
+  - mv bower_components-1.x bower_components
+  - gemini test test/visual

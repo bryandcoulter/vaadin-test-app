@@ -7,7 +7,7 @@
 
   <title>vaadin-date-picker Basic Examples</title>
 
-  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../sugar/dist/sugar.min.js"></script>
   <link rel="import" href="common.html">
 </head>
@@ -76,6 +76,34 @@
       <template>
         <vaadin-date-picker label="June 2017" min="2017-06-01" max="2017-06-30" initial-position="2017-06-01">
         </vaadin-date-picker>
+      </template>
+    </demo-snippet>
+
+    <h3>Using as a Form Field</h3>
+    <demo-snippet>
+      <template>
+        <iron-form>
+          <form method="post">
+            <vaadin-date-picker name="date" required error-message="This field is required"></vaadin-date-picker>
+            <vaadin-button>Submit</vaadin-button>
+          </form>
+        </iron-form>
+
+        <script>
+          window.addEventListener('WebComponentsReady', function() {
+            var form = document.querySelector('iron-form');
+
+            form.addEventListener('iron-form-submit', function() {
+              alert('Form submitted with date: ' + form.serializeForm().date);
+              return false;
+            });
+
+            var button = document.querySelector('vaadin-button');
+            button.addEventListener('click', function() {
+              form.submit();
+            });
+          });
+        </script>
       </template>
     </demo-snippet>
 
