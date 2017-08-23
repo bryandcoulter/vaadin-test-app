@@ -1,0 +1,33 @@
+{
+  "name": "vaadin-test-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "html-webpack-plugin": "^2.29.0",
+    "polymer-webpack-loader": "^1.2.1",
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.5.0"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --open",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bryandcoulter/vaadin-test-app.git"
+  },
+  "author": "cody loyd, bryan coulter",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bryandcoulter/vaadin-test-app/issues"
+  },
+  "homepage": "https://github.com/bryandcoulter/vaadin-test-app#readme"
+}
